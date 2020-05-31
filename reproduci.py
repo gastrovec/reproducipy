@@ -67,16 +67,19 @@ def store(tag, tee):
 
 
 @cli.command()
-@click.argument("commit-spec")
+@click.argument("commit-spec", required=False)
 @click.option("--tag")
 @click.option("--raw", "-r", is_flag=True)
 def load(commit_spec, tag=None, raw=False):
     # try to find all results with that hash, and print them.
     # if a tag is given, filter on that tag
+    if commit_spec is None:
+        commit_spec = "HEAD"
     if commit_spec != "all":
-        short_hash = (
+        full_hash = (
             subprocess.check_output(["git", "rev-parse", commit_spec],).decode().strip()
         )
+    short_hash = full_hash[:7]
     if tag is None:
         tags = Path("store").glob("*")
     else:
@@ -103,6 +106,9 @@ def load(commit_spec, tag=None, raw=False):
                     if not past_empty_line and raw:
                         continue
                     sys.stdout.write(line)
+            if not raw:
+                print()
+                print()
 
 
 if __name__ == "__main__":
