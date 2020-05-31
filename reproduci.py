@@ -83,7 +83,9 @@ def load(commit_spec, tag=None, raw=False):
         tags = [Path("store") / tag]
 
     for the_tag in tags:
-        if not tag and not raw:  # we are looking at several tags, therefore we print a header
+        if (
+            not tag and not raw
+        ):  # we are looking at several tags, therefore we print a header
             print("[{}]".format(the_tag.name))
         candidate_iter = (
             the_tag.glob("*")
