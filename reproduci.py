@@ -67,22 +67,39 @@ def store(tag, tee):
 
 
 @cli.command()
-@click.argument("short_hash")
+@click.argument("commit-spec")
 @click.option("--tag")
-def load(short_hash, tag=None):
+@click.option("--raw", "-r", is_flag=True)
+def load(commit_spec, tag=None, raw=False):
     # try to find all results with that hash, and print them.
     # if a tag is given, filter on that tag
+    if commit_spec != "all":
+        short_hash = (
+            subprocess.check_output(["git", "rev-parse", commit_spec],).decode().strip()
+        )
     if tag is None:
         tags = Path("store").glob("*")
     else:
         tags = [Path("store") / tag]
 
     for the_tag in tags:
-        if not tag:  # we are looking at several tags, therefore we print a header
+        if not tag and not raw:  # we are looking at several tags, therefore we print a header
             print("[{}]".format(the_tag.name))
-        for candidate in the_tag.glob("*-{}*".format(short_hash)):
+        candidate_iter = (
+            the_tag.glob("*")
+            if commit_spec == "all"
+            else the_tag.glob("*-{}*".format(short_hash))
+        )
+        for candidate in candidate_iter:
             with candidate.open() as f:
+                past_empty_line = False
                 for line in f:
+                    if not line.strip():
+                        past_empty_line = True
+                        if raw:
+                            continue
+                    if not past_empty_line and raw:
+                        continue
                     sys.stdout.write(line)
 
 
