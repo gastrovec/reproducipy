@@ -27,3 +27,7 @@ manpage of `git-rev-parse` for details):
     $ reproduci load  # print latest results across all tags
     $ reproduci load --tag main-result  # print latest results from tag "main-result"
     $ reproduci load abcdefg  # print results from commit with hash abcdefg...
+
+### Slurm support
+
+reproducipy has basic support for the [slurm workload manager](https://slurm.schedmd.com/).
