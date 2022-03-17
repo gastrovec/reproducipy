@@ -2,7 +2,7 @@ import sys
 import os
 from pathlib import Path
 
-def rootify():
+def get_root():
     """Change the CWD to the reproduci root."""
     cwd = Path(os.getcwd()).resolve()
     while not (cwd / "workdata").exists():
@@ -10,7 +10,9 @@ def rootify():
         if cwd.parent == cwd:
             raise RuntimeError("Can't find reproduci root")
 
-    os.chdir(cwd)
+    return cwd
+
+ROOT = get_root()
 
 def ensure_shebang(file):
     with open(file) as f:

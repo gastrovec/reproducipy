@@ -2,17 +2,14 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from functools import lru_cache
 from . import rootify, ensure_shebang
 
 def in_slurm():
     return "SLURM_JOB_ID" in os.environ
 
-@lru_cache
 def reroot():
     path_to_script = Path(sys.argv[0]).resolve()
     ensure_shebang(path_to_script)
-    rootify()
     return path_to_script
 
 def simple(**kwargs):
