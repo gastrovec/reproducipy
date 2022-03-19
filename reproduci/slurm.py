@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-from . import rootify, ensure_shebang
+from . import ensure_shebang
 
 def in_slurm():
     return "SLURM_JOB_ID" in os.environ
@@ -27,7 +27,8 @@ def simple(**kwargs):
         "--",
         path_to_script,
     ]
-    process = subprocess.run(args)
+    subprocess.run(args)
+    raise SystemExit(0)
 
 def multi(iterable, **kwargs):
     path_to_script = reroot()
@@ -36,7 +37,7 @@ def multi(iterable, **kwargs):
             if i == int(os.environ["SLURM_ARRAY_TASK_ID"]):
                 return conf
     iter_length = sum(1 for _ in iterable)
-    process = subprocess.run([
+    subprocess.run([
         "sbatch",
         # parameters:
         *(
@@ -48,3 +49,4 @@ def multi(iterable, **kwargs):
         "--",
         path_to_script,
     ])
+    raise SystemExit(0)
