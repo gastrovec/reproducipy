@@ -7,7 +7,16 @@ This is a companion tool to the [*reproduci* methodology](https://github.com/gas
 
     pip install reproduci
 
-## Usage
+## Initializing a reproduci project
+
+By running
+
+    reproduci init
+
+a new Git repo will be created with the basic folder and file structure of
+reproduci in place.
+
+## Using the store
 
 Pipe data (for example results) into `reproduci store` with some tag name,
 refering to the type of data to store:
@@ -28,6 +37,50 @@ manpage of `git-rev-parse` for details):
     $ reproduci load --tag main-result  # print latest results from tag "main-result"
     $ reproduci load abcdefg  # print results from commit with hash abcdefg...
 
+## Use as a Python module
+
+No matter from where you call your scripts, `reproduci.ROOT` will always point
+to the main project directory (it's a `pathlib.Path`).
+
 ### Slurm support
 
-reproducipy has basic support for the [slurm workload manager](https://slurm.schedmd.com/).
+reproducipy has basic support for the [slurm workload manager](https://slurm.schedmd.com/):
+
+In its simplest form, you can set options for how to run the script via slurm:
+
+    from reproduci import slurm
+
+    slurm.simple(
+        time=15,
+        job_name="example script",
+    )
+
+When run directly, this script will schedule itself with `sbatch --time 15
+--job-name 'example script'` (the keyword arguments of `slurm.simple` are run
+through a simple translation (converting underscores to dashes) and handed
+directly to `sbatch`), and exit immediately afterwards (any code written
+_after_ `slurm.simple()` will not be executed).
+
+When slurm runs the script, it doesn't schedule itself again, but simply
+continues executing the code.
+
+In essense, this allows you to schedule your scripts by just attempting to run
+them directly.
+
+We also support the `--job-array` option with some magic:
+
+    from reproduci import slurm
+
+    color, taste = slurm.multi(
+        (color, taste for color in ("red", "green") for taste in ("sweet", "sour", "salty")),
+        time=5,
+    )
+
+This schedules a job array of size six, one for each combination of color and
+taste. The first argument to `slurm.multi` is just an arbitrary iterable.
+
+The scheduled parts figure out which sub-job they are (slurm informs us of that
+information via environment variables) and returns the corresponding values. In
+our example, that means that in one run, `color` is `"red"` and `taste` is
+`"sweet"`, in the second one it's `"red"` and `"sour"`, and so on.
+`slurm.multi()` abstracts the plumbing of job arrays away from the user.
