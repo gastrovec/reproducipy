@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "reproduci"
-version = "0.6.0"
+version = "0.6.1"
 description = "Companion project to github.com/gastrovec/reproduci"
 authors = ["L3viathan <git@l3vi.de>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 click = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
