@@ -64,6 +64,7 @@ slurm.simple(
     partition="my_partition",
     job_name="example script",
 )
+```
 
 When run directly, this script will schedule itself with `sbatch --time 15
 --job-name 'example script'` (the keyword arguments of `slurm.simple` are run
