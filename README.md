@@ -52,6 +52,7 @@ In its simplest form, you can set options for how to run the script via slurm:
 
     slurm.simple(
         time=15,
+        partition="my_partition",
         job_name="example script",
     )
 
@@ -74,6 +75,7 @@ We also support the `--job-array` option with some magic:
     color, taste = slurm.multi(
         (color, taste for color in ("red", "green") for taste in ("sweet", "sour", "salty")),
         time=5,
+        partition="my_partition",
     )
 
 This schedules a job array of size six, one for each combination of color and
@@ -84,3 +86,27 @@ information via environment variables) and returns the corresponding values. In
 our example, that means that in one run, `color` is `"red"` and `taste` is
 `"sweet"`, in the second one it's `"red"` and `"sour"`, and so on.
 `slurm.multi()` abstracts the plumbing of job arrays away from the user.
+
+### Slurm ❤️ click
+
+An alternative interface to the slurm integration is using `click`:
+
+    import click
+    from reproduci import slurm
+
+    @slurm.command(time=5, partition="my_partition")
+    @click.option("--color", type=slurm.Choice(["red", "green"]))
+    @click.option("--taste", type=slurm.Choice(["sweet", "sour", "salty"]))
+    @click.option("--frobnication")
+    def cli(color, taste, frobnication):
+        ...
+
+TL;DR: Use `slurm.command()` instead of `click.command()`, and use options of
+the type `slurm.Choice` to parametrize over them. Options and arguments that
+aren't of the type `slurm.Choice` are left alone and given to the scheduled
+jobs. Note that fancy callback logic can break all of this, don't use that kind
+of thing here.
+
+The way you'd schedule this is by calling the script and passing in any
+*non-slurmed* options and arguments. Leave the slurmed options alone; don't
+pass any values for them (we take care of that).
