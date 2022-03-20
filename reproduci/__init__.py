@@ -2,6 +2,7 @@ import sys
 import os
 from pathlib import Path
 
+
 def get_root():
     """Change the CWD to the reproduci root."""
     cwd = Path(os.getcwd()).resolve()
@@ -12,11 +13,15 @@ def get_root():
 
     return cwd
 
+
 ROOT = get_root()
+
 
 def ensure_shebang(file):
     with open(file) as f:
         line = next(f)
     if sys.executable not in line:
-        raise RuntimeError(f"""Shebang not found or faulty. Make sure it is exactly:
-#!{sys.executable}""")
+        raise RuntimeError(
+            f"""Shebang not found or faulty. Make sure it is exactly:
+#!{sys.executable}"""
+        )

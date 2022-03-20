@@ -111,7 +111,11 @@ def load(commit_spec, tag, raw, show_dirty):
         commit_spec = "HEAD"
     if commit_spec != "all":
         full_hash = (
-            subprocess.check_output(["git", "rev-parse", commit_spec],).decode().strip()
+            subprocess.check_output(
+                ["git", "rev-parse", commit_spec],
+            )
+            .decode()
+            .strip()
         )
         short_hash = full_hash[:7]
     if tag is None:
