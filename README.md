@@ -5,13 +5,17 @@ This is a companion tool to the [*reproduci* methodology](https://github.com/gas
 
 ## Installation
 
-    pip install reproduci
+```
+pip install reproduci
+```
 
 ## Initializing a reproduci project
 
 By running
 
-    reproduci init
+```
+reproduci init
+```
 
 a new Git repo will be created with the basic folder and file structure of
 reproduci in place.
@@ -21,9 +25,11 @@ reproduci in place.
 Pipe data (for example results) into `reproduci store` with some tag name,
 refering to the type of data to store:
 
-    $ echo some result | reproduci store main-result
-             ^                               ^
-      Programm output                Arbitrary tag
+```
+$ echo some result | reproduci store main-result
+          ^                               ^
+    Programm output                Arbitrary tag
+```
 
 The output of the program will be saved alongside the current git commit hash,
 timestamp, and tag in the internal `store/` directory.
@@ -33,9 +39,11 @@ To retrieve data from the store, use `reproduci load` with some git reference
 (usually a commit hash; see the section called "SPECIFYING REVISIONS" in the
 manpage of `git-rev-parse` for details):
 
-    $ reproduci load  # print latest results across all tags
-    $ reproduci load --tag main-result  # print latest results from tag "main-result"
-    $ reproduci load abcdefg  # print results from commit with hash abcdefg...
+```
+$ reproduci load  # print latest results across all tags
+$ reproduci load --tag main-result  # print latest results from tag "main-result"
+$ reproduci load abcdefg  # print results from commit with hash abcdefg...
+```
 
 ## Use as a Python module
 
@@ -48,13 +56,14 @@ reproducipy has basic support for the [slurm workload manager](https://slurm.sch
 
 In its simplest form, you can set options for how to run the script via slurm:
 
-    from reproduci import slurm
+```python
+from reproduci import slurm
 
-    slurm.simple(
-        time=15,
-        partition="my_partition",
-        job_name="example script",
-    )
+slurm.simple(
+    time=15,
+    partition="my_partition",
+    job_name="example script",
+)
 
 When run directly, this script will schedule itself with `sbatch --time 15
 --job-name 'example script'` (the keyword arguments of `slurm.simple` are run
@@ -70,13 +79,15 @@ them directly.
 
 We also support the `--job-array` option with some magic:
 
-    from reproduci import slurm
+```python
+from reproduci import slurm
 
-    color, taste = slurm.multi(
-        (color, taste for color in ("red", "green") for taste in ("sweet", "sour", "salty")),
-        time=5,
-        partition="my_partition",
-    )
+color, taste = slurm.multi(
+    (color, taste for color in ("red", "green") for taste in ("sweet", "sour", "salty")),
+    time=5,
+    partition="my_partition",
+)
+```
 
 This schedules a job array of size six, one for each combination of color and
 taste. The first argument to `slurm.multi` is just an arbitrary iterable.
@@ -91,15 +102,17 @@ our example, that means that in one run, `color` is `"red"` and `taste` is
 
 An alternative interface to the slurm integration is using `click`:
 
-    import click
-    from reproduci import slurm
+```python
+import click
+from reproduci import slurm
 
-    @slurm.command(time=5, partition="my_partition")
-    @click.option("--color", type=slurm.Choice(["red", "green"]))
-    @click.option("--taste", type=slurm.Choice(["sweet", "sour", "salty"]))
-    @click.option("--frobnication")
-    def cli(color, taste, frobnication):
-        ...
+@slurm.command(time=5, partition="my_partition")
+@click.option("--color", type=slurm.Choice(["red", "green"]))
+@click.option("--taste", type=slurm.Choice(["sweet", "sour", "salty"]))
+@click.option("--frobnication")
+def cli(color, taste, frobnication):
+    ...
+```
 
 TL;DR: Use `slurm.command()` instead of `click.command()`, and use options of
 the type `slurm.Choice` to parametrize over them. Options and arguments that
