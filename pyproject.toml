@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "reproduci"
-version = "0.6.2"
+version = "0.7.0"
 description = "Companion project to github.com/gastrovec/reproduci"
 authors = ["L3viathan <git@l3vi.de>"]
 license = "MIT"
